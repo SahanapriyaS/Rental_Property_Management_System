@@ -102,7 +102,7 @@ public class User {
 		return username;
 	}
 
-	public void setUserName(String username) {
+	public void setUsername(String username) {
 		this.username = username;
 	}
 
@@ -152,6 +152,10 @@ public class User {
 				+ password + ", phone=" + phone + ", provider=" + provider + ", enabled=" + enabled + ", authorities="
 				+ authorities + "]";
 	}
+
+	
+
+	
 	
 	
 

@@ -6,6 +6,7 @@ import java.util.Set;
 import com.ur.enums.Role;
 
 public class UserDetailsDTO {
+	private Long userId;
     private String userName;
     private String name;
     private String email;
@@ -16,9 +17,10 @@ public class UserDetailsDTO {
 
     public UserDetailsDTO() {}
 
-    public UserDetailsDTO(String userName, String name, String email, Long phone,
+    public UserDetailsDTO(Long userId,String userName, String name, String email, Long phone,
                           String provider, boolean enabled, Set<Role> roles) {
-        this.userName = userName;
+        this.userId=userId;
+    	this.userName = userName;
         this.name = name;
         this.email = email;
         this.phone = phone;
@@ -27,6 +29,8 @@ public class UserDetailsDTO {
         this.roles = roles;
     }
 
+    public Long getUserId() {return userId;}
+    public void setUserId(Long userName) {this.userId=userId;}
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
 

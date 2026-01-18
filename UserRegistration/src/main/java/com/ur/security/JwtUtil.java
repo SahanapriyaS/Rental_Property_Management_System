@@ -23,14 +23,25 @@ public class JwtUtil {
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
 	
-	public String generateToken(String username) {
+	public String generateToken(String username, Long id,String role) {
 		return Jwts.builder()
 				.setSubject(username)
+				 .claim("id",id)
+				 .claim("role",role)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date(System.currentTimeMillis()+ jwtExpirationMs))
 				.signWith(getSigningKey(), SignatureAlgorithm.HS256)
 				.compact();		
 	}
+	
+	public Long extractUserId(String token) {
+	    return Jwts.parserBuilder()
+	            .setSigningKey(getSigningKey())
+	            .build()
+	            .parseClaimsJws(token)
+	            .getBody()
+	            .get("id", Long.class);
+    }
 	
 	public String extractUsername(String token) {
 		return Jwts.parserBuilder()
@@ -52,6 +63,8 @@ public class JwtUtil {
 			return false;
 		}
 	}
+
+	
 
 
 }

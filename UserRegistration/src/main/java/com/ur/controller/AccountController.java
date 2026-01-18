@@ -1,78 +1,80 @@
-
 package com.ur.controller;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ur.config.CurrentUserUtil;
+import com.ur.dto.UpdateUserRequest;
 import com.ur.dto.UserDetailsDTO;
-import com.ur.entity.Authority;
 import com.ur.entity.User;
 import com.ur.enums.Role;
-import com.ur.repository.UserRepository;
+import com.ur.service.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class AccountController {
 
-    @Autowired
-    private CurrentUserUtil currentUserUtil;
+    private final UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
+    public AccountController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public ResponseEntity<String> home() {
-        User current = currentUserUtil.getUser();
-        if (current == null) {
-            return ResponseEntity.ok("Welcome home (not logged in)");
-        }
-        return ResponseEntity.ok("Welcome home " + current.getUsername());
+        User current = userService.getCurrentUser();
+        return current == null
+                ? ResponseEntity.ok("Welcome home (not logged in)")
+                : ResponseEntity.ok("Welcome home " + current.getUsername());
     }
 
     @GetMapping("/admin/{id}")
-    public ResponseEntity<?> admin(@PathVariable Long id) {
-        return getUserDetailsForRole(id, Role.ADMIN);
+    public ResponseEntity<UserDetailsDTO> admin(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserByIdAndRole(id, Role.ADMIN));
     }
 
     @GetMapping("/owner/{id}")
-    public ResponseEntity<?> owner(@PathVariable Long id) {
-        return getUserDetailsForRole(id, Role.OWNER);
+    public ResponseEntity<UserDetailsDTO> owner(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserByIdAndRole(id, Role.OWNER));
     }
 
     @GetMapping("/tenant/{id}")
-    public ResponseEntity<?> tenant(@PathVariable Long id) {
-        return getUserDetailsForRole(id, Role.TENANT);
+    public ResponseEntity<UserDetailsDTO> tenant(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserByIdAndRole(id, Role.TENANT));
     }
 
-    private ResponseEntity<?> getUserDetailsForRole(Long id, Role requiredRole) {
-        return userRepository.findById(id)
-            .map(user -> {
-                Set<Role> roles = user.getAuthorities()
-                        .stream()
-                        .map(Authority::getAuthority)
-                        .collect(Collectors.toSet());
-
-                if (!roles.contains(requiredRole)) {
-                    return ResponseEntity.status(404).body("User with id " + id + " is not a " + requiredRole);
-                }
-
-                UserDetailsDTO dto = new UserDetailsDTO(
-                    user.getUsername(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getPhone(),
-                    user.getProvider(),
-                    user.isEnabled(),
-                    roles
-                );
-                return ResponseEntity.ok(dto);
-            })
-            .orElseGet(() -> ResponseEntity.status(404).body("User not found with id: " + id));
+    @GetMapping("/admin/email/{email}")
+    public ResponseEntity<UserDetailsDTO> adminByEmail(@PathVariable String email) {
+    	 UserDetailsDTO admin = userService.getUserByEmailAndRole(email, Role.ADMIN);
+         if(admin == null) return ResponseEntity.notFound().build();
+         return ResponseEntity.ok(admin);
     }
+    
+    @PreAuthorize("hasRole('OWNER')")
+    @GetMapping("/owner/email/{email}")
+    public ResponseEntity<UserDetailsDTO> ownerByEmail(@PathVariable String email) {
+    	 UserDetailsDTO user = userService.getUserByEmailAndRole(email, Role.OWNER);
+         if(user == null) return ResponseEntity.notFound().build();
+         return ResponseEntity.ok(user);   
+    }
+    
+    @PreAuthorize("hasRole('TENANT')")
+    @GetMapping("/tenant/email/{email}")
+    public ResponseEntity<UserDetailsDTO> tenantByEmail(@PathVariable String email) {
+    	 UserDetailsDTO user = userService.getUserByEmailAndRole(email, Role.TENANT);
+         if(user == null) return ResponseEntity.notFound().build();
+         return ResponseEntity.ok(user);    
+    }
+    
+    @PutMapping("/user/profile")
+    public ResponseEntity<Object> updateProfile(
+            @Valid @RequestBody UpdateUserRequest request) {
+
+        return ResponseEntity.ok(userService.updateCurrentUser(request));
+    }
+
 }

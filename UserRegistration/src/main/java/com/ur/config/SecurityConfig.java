@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.ur.repository.UserRepository;
 import com.ur.security.JwtAuthenticationFilter;
 import com.ur.security.JwtAuthorizationFilter;
 import com.ur.security.JwtUtil;
@@ -25,9 +26,11 @@ import com.ur.security.JwtUtil;
 public class SecurityConfig {
 	
 private final JwtUtil jwtUtil;
+private final UserRepository userRepo;
 	
-	public SecurityConfig(JwtUtil jwtUtil) {
+	public SecurityConfig(JwtUtil jwtUtil, UserRepository userRepo) {
 		this.jwtUtil = jwtUtil;
+		this.userRepo = userRepo;
 	}
 	
 	@Bean
@@ -53,17 +56,19 @@ private final JwtUtil jwtUtil;
             UserDetailsService userDetailsService
 ) throws Exception {
 	 
-		JwtAuthenticationFilter jwtAuthFilter = new JwtAuthenticationFilter(authenticationManager, jwtUtil);
+		JwtAuthenticationFilter jwtAuthFilter = new JwtAuthenticationFilter(authenticationManager, jwtUtil, userRepo);
 		jwtAuthFilter.setFilterProcessesUrl("/login");
 		
 	    http
 	    .csrf(csrf -> csrf.disable())
 	    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	    .authorizeHttpRequests(auth -> auth
-	            .requestMatchers("/signup","/login").permitAll()
+	            .requestMatchers("/signup","/login","/auth/**").permitAll()
 	            .requestMatchers("/admin/**").hasAuthority("ADMIN")
 	            .requestMatchers("/owner/**").hasAnyAuthority("OWNER","ADMIN")
 	            .requestMatchers("/tenant/**").hasAnyAuthority("TENANT","ADMIN")
+	            .requestMatchers("/user/**").hasAnyAuthority("ADMIN", "OWNER", "TENANT")
+
 	            .anyRequest().authenticated()
 	        )
 //	        .formLogin(login -> login.permitAll())
@@ -73,6 +78,8 @@ private final JwtUtil jwtUtil;
 	 
 	    return http.build();
 	}
+	
+	
 
 	
 	

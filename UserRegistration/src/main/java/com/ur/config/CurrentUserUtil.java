@@ -20,6 +20,7 @@ public class CurrentUserUtil {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if(auth == null || !auth.isAuthenticated()) {
 			return null;
+		
 		}
 		
 
