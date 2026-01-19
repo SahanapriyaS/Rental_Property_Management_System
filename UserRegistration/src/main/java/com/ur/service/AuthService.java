@@ -1,7 +1,9 @@
-
 package com.ur.service;
 
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,16 +20,21 @@ import jakarta.validation.Valid;
 @Service
 public class AuthService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
     @Autowired
-	private UserRepository userRepository;
-    
+    private UserRepository userRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-  
     @Transactional
     public String registerUser(@Valid SignupRequest request) {
+
+        logger.info("Attempting to register user with username='{}'", request.getUsername());
+
         if (userRepository.existsByUsername(request.getUsername())) {
+            logger.warn("Registration failed: Username '{}' already exists", request.getUsername());
             return "Username already exists";
         }
 
@@ -47,8 +54,10 @@ public class AuthService {
         user.setAuthorities(Set.of(authority));
 
         userRepository.save(user);
+
+        logger.info("User '{}' registered successfully with role '{}'",
+                user.getUsername(), request.getRole());
+
         return "User registered successfully";
     }
-
-	
 }

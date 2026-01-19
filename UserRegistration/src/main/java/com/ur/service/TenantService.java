@@ -2,6 +2,9 @@ package com.ur.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,53 +20,70 @@ import com.ur.repository.UserRepository;
 @Transactional
 public class TenantService {
 
-	@Autowired
+    private static final Logger logger = LoggerFactory.getLogger(TenantService.class);
+
+    @Autowired
     private TenantRepository tenantRepo;
-	
-	@Autowired
+
+    @Autowired
     private UserRepository userRepo;
-	
-	@Autowired
+
+    @Autowired
     private PropertyRepository propertyRepo;
 
-    public TenantService(TenantRepository tenantRepo, 
-                         UserRepository userRepo,
-                         PropertyRepository propertyRepo) {
-        this.tenantRepo = tenantRepo;
-        this.userRepo = userRepo;
-        this.propertyRepo = propertyRepo;
-    }
-
     public Tenant create(Long userId, Long propertyId, Tenant tenant) {
+        logger.info("Creating tenant for userId={} and propertyId={}", userId, propertyId);
 
         User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User not found with id={}", userId);
+                    return new RuntimeException("User not found");
+                });
 
         Property property = propertyRepo.findById(propertyId)
-                .orElseThrow(() -> new RuntimeException("Property not found"));
+                .orElseThrow(() -> {
+                    logger.error("Property not found with id={}", propertyId);
+                    return new RuntimeException("Property not found");
+                });
 
         tenant.setUser(user);
         tenant.setProperty(property);
 
-        return tenantRepo.save(tenant);
+        Tenant savedTenant = tenantRepo.save(tenant);
+        logger.info("Tenant created successfully with id={}", savedTenant.getId());
+
+        return savedTenant;
     }
 
     public List<Tenant> getAllTenants() {
+        logger.info("Fetching all tenants");
         return tenantRepo.findAll();
     }
 
     public List<Tenant> getTenantsByVerification(boolean verified) {
+        logger.info("Fetching tenants with verified={}", verified);
         return tenantRepo.findByVerified(verified);
     }
 
     public Tenant getTenantById(Long id) {
+        logger.info("Fetching tenant with id={}", id);
+
         return tenantRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tenant not found"));
+                .orElseThrow(() -> {
+                    logger.error("Tenant not found with id={}", id);
+                    return new RuntimeException("Tenant not found");
+                });
     }
 
     public Tenant updateVerificationStatus(Long tenantId, boolean verified) {
+        logger.info("Updating tenant verification status. tenantId={}, verified={}", tenantId, verified);
+
         Tenant tenant = getTenantById(tenantId);
         tenant.setVerified(verified);
-        return tenantRepo.save(tenant);
+
+        Tenant updatedTenant = tenantRepo.save(tenant);
+        logger.info("Tenant verification status updated successfully for id={}", updatedTenant.getId());
+
+        return updatedTenant;
     }
 }
