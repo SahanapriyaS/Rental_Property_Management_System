@@ -3,6 +3,7 @@ package com.ur.service;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,22 +23,19 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final CurrentUserUtil currentUserUtil;
-    private final UserMapper userMapper;
+	@Autowired
+    private UserRepository userRepository;
+	
+	@Autowired
+    private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+    private CurrentUserUtil currentUserUtil;
+	
+	@Autowired
+    private UserMapper userMapper;
 
-    public UserServiceImpl(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            CurrentUserUtil currentUserUtil,
-            UserMapper userMapper
-    ) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.currentUserUtil = currentUserUtil;
-        this.userMapper = userMapper;
-    }
+   
 
     @Override
     public UserDetailsDTO getUserByIdAndRole(Long id, Role role) {

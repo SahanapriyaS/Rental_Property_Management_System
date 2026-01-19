@@ -65,7 +65,7 @@ private final UserRepository userRepo;
 	    .authorizeHttpRequests(auth -> auth
 	            .requestMatchers("/signup","/login","/auth/**").permitAll()
 	            .requestMatchers("/admin/**").hasAuthority("ADMIN")
-	            .requestMatchers("/owner/**").hasAnyAuthority("OWNER","ADMIN")
+	            .requestMatchers("/owner/**","/payments/**").hasAnyAuthority("OWNER","ADMIN")
 	            .requestMatchers("/tenant/**").hasAnyAuthority("TENANT","ADMIN")
 	            .requestMatchers("/user/**").hasAnyAuthority("ADMIN", "OWNER", "TENANT")
 

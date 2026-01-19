@@ -33,26 +33,26 @@ public class PasswordService {
         PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(token);
         resetToken.setUser(user);
-        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1)); // valid 1 hour
+        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1)); 
 
         tokenRepository.save(resetToken);
 
         System.out.println("Password reset token: " + token);
     }
 
-    public void resetPassword(String token, String newPassword) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(token)
-            .orElseThrow(() -> new RuntimeException("Invalid token"));
-
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
-        }
-
-        User user = resetToken.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-
-        tokenRepository.delete(resetToken);
-    }
+//    public void resetPassword(String token, String newPassword) {
+//        PasswordResetToken resetToken = tokenRepository.findByToken(token)
+//            .orElseThrow(() -> new RuntimeException("Invalid token"));
+//
+//        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+//            throw new RuntimeException("Token expired");
+//        }
+//
+//        User user = resetToken.getUser();
+//        user.setPassword(passwordEncoder.encode(newPassword));
+//        userRepository.save(user);
+//
+//        tokenRepository.delete(resetToken);
+//    }
 }
 

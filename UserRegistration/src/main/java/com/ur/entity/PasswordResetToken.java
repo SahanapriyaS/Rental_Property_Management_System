@@ -24,7 +24,6 @@ public class PasswordResetToken {
 
 	public PasswordResetToken() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public PasswordResetToken(Long id, String token, User user, LocalDateTime expiryDate) {
