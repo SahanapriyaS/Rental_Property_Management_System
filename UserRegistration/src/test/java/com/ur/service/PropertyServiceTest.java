@@ -81,7 +81,6 @@ class PropertyServiceTest {
     @Test
     void testGetAllProperties() {
         propertyService.createProperty(createValidProperty("Property1"), owner.getId());
-//        propertyService.createProperty(createValidProperty("Property2"), owner.getId());
 
         List<Property> all = propertyService.getAllProperties();
         assertEquals(1, all.size()-1);

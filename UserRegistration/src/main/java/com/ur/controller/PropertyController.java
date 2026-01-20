@@ -33,7 +33,7 @@ public class PropertyController {
 	@Autowired
     private PropertyMapper propertyMapper;
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PropertyResponseDTO> createProperty(
             @Valid @RequestBody PropertyRequestDTO requestDTO,
@@ -73,7 +73,6 @@ public class PropertyController {
     }
 
 
-    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProperty(@PathVariable Long id) {
         propertyService.deleteProperty(id);

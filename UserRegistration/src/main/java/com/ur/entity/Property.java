@@ -50,7 +50,7 @@ public class Property {
     @NotBlank
     private String availabilityStatus; 
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 

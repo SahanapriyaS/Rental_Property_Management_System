@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -65,7 +66,8 @@ private final UserRepository userRepo;
 	    .authorizeHttpRequests(auth -> auth
 	            .requestMatchers("/signup","/login","/auth/**").permitAll()
 	            .requestMatchers("/admin/**").hasAuthority("ADMIN")
-	            .requestMatchers("/owner/**","/payments/**").hasAnyAuthority("OWNER","ADMIN")
+	            .requestMatchers("/owner/**","/payments/**","/leases/**").hasAnyAuthority("OWNER","ADMIN")
+	            .requestMatchers(HttpMethod.PUT, "/leases/**").hasAnyRole("ADMIN", "OWNER")
 	            .requestMatchers("/tenant/**").hasAnyAuthority("TENANT","ADMIN")
 	            .requestMatchers("/user/**").hasAnyAuthority("ADMIN", "OWNER", "TENANT")
 

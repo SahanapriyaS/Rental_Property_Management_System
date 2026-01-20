@@ -24,21 +24,21 @@ public class PasswordService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void createPasswordResetToken(String email) {
-        User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-        String token = UUID.randomUUID().toString();
-
-        PasswordResetToken resetToken = new PasswordResetToken();
-        resetToken.setToken(token);
-        resetToken.setUser(user);
-        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1)); 
-
-        tokenRepository.save(resetToken);
-
-        System.out.println("Password reset token: " + token);
-    }
+//    public void createPasswordResetToken(String email) {
+//        User user = userRepository.findByEmail(email)
+//            .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        String token = UUID.randomUUID().toString();
+//
+//        PasswordResetToken resetToken = new PasswordResetToken();
+//        resetToken.setToken(token);
+//        resetToken.setUser(user);
+//        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1)); 
+//
+//        tokenRepository.save(resetToken);
+//
+//        System.out.println("Password reset token: " + token);
+//    }
 
 //    public void resetPassword(String token, String newPassword) {
 //        PasswordResetToken resetToken = tokenRepository.findByToken(token)

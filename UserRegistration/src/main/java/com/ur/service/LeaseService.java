@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ur.entity.Lease;
 import com.ur.entity.Property;
 import com.ur.entity.Tenant;
+import com.ur.exception.ResourceNotFoundException;
 import com.ur.repository.LeaseRepository;
 import com.ur.repository.PropertyRepository;
 import com.ur.repository.TenantRepository;
@@ -62,13 +63,9 @@ public class LeaseService {
     }
 
     public Lease getLeaseById(Long id) {
-        logger.info("Fetching lease with id={}", id);
+    	return leaseRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Lease with id " + id + " not found"));
 
-        return leaseRepo.findById(id)
-                .orElseThrow(() -> {
-                    logger.error("Lease not found with id={}", id);
-                    return new RuntimeException("Lease not found");
-                });
     }
 
     public Lease updateStatus(Long id, String status) {
